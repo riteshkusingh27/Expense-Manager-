@@ -13,10 +13,16 @@ import java.util.UUID;
 @RequiredArgsConstructor   // internally uses component annotation
 public class ProfileService {
     private final ProfileRepo  profileRepo;
+    private final EmailService emailService;
     public Profiledto registerProfile(Profiledto profiledto){
         ProfileEntity newprofile = toEntity(profiledto);
         newprofile.setActivationToken(UUID.randomUUID().toString());
         newprofile = profileRepo.save(newprofile);
+        //send activation email
+        String activationlink = "http:localhost:8080/api/v1.0/activate?token="+newprofile.getActivationToken();
+        String subject = "Activate your Expense tracker account";
+        String body = "Click on the following to activate your Expense tracker account:" + activationlink;
+        emailService.sendEmail(newprofile.getEmail(),subject,body);
         // again convert the saved entity to dto  (response)
        return  toDto(newprofile);
 
