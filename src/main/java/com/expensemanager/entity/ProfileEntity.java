@@ -36,7 +36,6 @@ public class ProfileEntity {
     private String activationToken;
 
      @PrePersist    // before persisting the entity into the database its going to execute and store the value into the db
-
     public void prePersit(){
         if(this.isActive == null){
             isActive = false ;

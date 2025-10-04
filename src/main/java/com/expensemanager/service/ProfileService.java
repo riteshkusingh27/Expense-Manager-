@@ -87,7 +87,7 @@ public class ProfileService {
     // current profile
     public ProfileEntity getcurrentProfile(){
       Authentication auth =  SecurityContextHolder.getContext().getAuthentication();
-
+           // return the current profile details from the database
         return profileRepo.findByEmail(auth.getName()).orElseThrow(()->new RuntimeException("Profile not found"));
     }
 
