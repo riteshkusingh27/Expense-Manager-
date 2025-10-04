@@ -9,7 +9,6 @@ import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
-import java.security.Key;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -20,10 +19,10 @@ public class Jwtutil {
     @Value("${jwt.secret.key}")
     private  String SECRET_KEY;
 
-    public String generateToken(UserDetails userdetails) {
+    public String generateToken(String userdetails) {
         // claims == piece of token embedded in a jwt token
         Map<String, Object> claims = new HashMap<>();
-        return createToken(claims, userdetails.getUsername());
+        return createToken(claims, userdetails);
     }
 
     private String createToken(Map<String, Object> claims, String username) {
@@ -31,6 +30,7 @@ public class Jwtutil {
                 .setClaims(claims)
                 .setSubject(username)
                 .setIssuedAt(new java.util.Date(System.currentTimeMillis()))
+                // setting expiration time for 10 hours
                 .setExpiration(new java.util.Date(System.currentTimeMillis() + 1000 * 60 * 60 * 10)) // 10 hours
                 .signWith(getSecretKey())
                 // generates the final jwt string

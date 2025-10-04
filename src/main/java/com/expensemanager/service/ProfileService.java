@@ -4,6 +4,7 @@ import com.expensemanager.dto.AuthDto;
 import com.expensemanager.dto.Profiledto;
 import com.expensemanager.entity.ProfileEntity;
 import com.expensemanager.repository.ProfileRepo;
+import com.expensemanager.util.Jwtutil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Profile;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -24,6 +25,8 @@ public class ProfileService {
     private final AuthenticationManager authenticationManager;
     private final EmailService emailService;
     private final PasswordEncoder pas;
+    private final Jwtutil jwtutil;
+
     public Profiledto registerProfile(Profiledto profiledto){
         ProfileEntity newprofile = toEntity(profiledto);
         newprofile.setActivationToken(UUID.randomUUID().toString());
@@ -110,8 +113,9 @@ public class ProfileService {
         try{
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(authdto.getEmail(), authdto.getPassword()));
             // generate jwt token
+            String token = jwtutil.generateToken(authdto.getEmail());
             return Map.of(
-                    "token" , "jwttoken",
+                    "token" , token,
                     "user" , getpublicProfile(authdto.getEmail())
             );
         } catch (Exception e){
