@@ -45,6 +45,13 @@ public class CategoryService {
     }
 
 
+    // get categories by type for current profile/ user
+    public List<Categorydto> getCategoriesByTypeForCurrentProfile(String type){
+        ProfileEntity profile = profileService.getcurrentProfile();
+        List<CategoryEntity> categories = categoryRepo.findByTypeAndProfileId(type,profile.getId());
+        return categories.stream().map(this::toDto).toList();
+    }
+
 
 
 
