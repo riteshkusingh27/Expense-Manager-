@@ -26,7 +26,6 @@ public class Categorydto {
     private String icon ;
      private String type ;
     private LocalDateTime createdAt;
-
     private LocalDateTime updatedAt;
 
 }

@@ -1,4 +1,4 @@
-package com.expensemanager.dto;
+package com.expensemanager.entity;
 
 
 import com.expensemanager.entity.ProfileEntity;

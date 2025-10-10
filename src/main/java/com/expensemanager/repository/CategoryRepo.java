@@ -1,6 +1,7 @@
 package com.expensemanager.repository;
 
-import com.expensemanager.dto.CategoryEntity;
+
+import com.expensemanager.entity.CategoryEntity;
 import com.expensemanager.entity.ProfileEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 
