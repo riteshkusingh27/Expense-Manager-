@@ -51,6 +51,17 @@ public class CategoryService {
         List<CategoryEntity> categories = categoryRepo.findByTypeAndProfileId(type,profile.getId());
         return categories.stream().map(this::toDto).toList();
     }
+      // updating the category
+    public Categorydto updateCategory(Long categoryid, Categorydto dto){
+        ProfileEntity profile = profileService.getcurrentProfile();
+       CategoryEntity existingCategory =  categoryRepo.findByIdAndProfileId(categoryid,profile.getId())
+                .orElseThrow(()-> new RuntimeException("Category not found or not accessible"));
+       existingCategory.setName(dto.getName());
+       existingCategory.setIcon(dto.getIcon());
+
+       categoryRepo.save(existingCategory);
+       return toDto(existingCategory);
+    }
 
 
 
