@@ -9,6 +9,9 @@ import com.expensemanager.repository.ExpenseRepo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class ExpenseService {
@@ -19,14 +22,23 @@ public class ExpenseService {
 
     // adding a new expense to the databse
     public ExpenseDto addExpense(ExpenseDto dto){
-       ProfileEntity profile =  profileService.getcurrentProfile();
+        ProfileEntity profile =  profileService.getcurrentProfile();
       CategoryEntity category =  categoryRepo.findById(dto.getCategoryId()).orElseThrow(()-> new RuntimeException(("Category not found")));
       ExpenseEntity newexpense = toEntity(dto,profile,category);
       newexpense = expenseRepo.save(newexpense);
       return toDto(newexpense);
-
-
     }
+
+       // retrieve all the expenses for the current profile for current month on the start date and end date
+       public List<ExpenseDto> getCurrentMonthExpenses(){
+        ProfileEntity profile = profileService.getcurrentProfile();
+        LocalDate now = LocalDate.now();
+        LocalDate startdate = now.withDayOfMonth(1);
+        LocalDate enddate =  now.withDayOfMonth(now.lengthOfMonth());
+       List<ExpenseEntity>  list = expenseRepo.findByProfileIdAndDateBetween(profile.getId(),startdate,enddate);
+            return list.stream().map(this::toDto).toList();
+       }
+
 
 
     // helper methods

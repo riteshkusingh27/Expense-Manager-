@@ -14,6 +14,9 @@ import com.expensemanager.repository.IncomeRepo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class IncomeService {
@@ -32,6 +35,16 @@ public class IncomeService {
 
 
     }
+ // retrieve all the expenses for the current profile for current month on the start date and end date
+    public List<IncomeDto> getCurrentMonthIncome(){
+        ProfileEntity profile = profileService.getcurrentProfile();
+        LocalDate now = LocalDate.now();
+        LocalDate startdate = now.withDayOfMonth(1);
+        LocalDate enddate =  now.withDayOfMonth(now.lengthOfMonth());
+        List<IncomeEntity>  list = incomerepo.findByProfileIdAndDateBetween(profile.getId(),startdate,enddate);
+        return list.stream().map(this::toDto).toList();
+    }
+
 
 
     // helper methods
