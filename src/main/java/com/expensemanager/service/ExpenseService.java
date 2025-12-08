@@ -39,6 +39,16 @@ public class ExpenseService {
             return list.stream().map(this::toDto).toList();
        }
 
+       //  delete expense by id for current user
+    public void deleteExpense(Long expenseId){
+       ProfileEntity profile =  profileService.getcurrentProfile();
+       ExpenseEntity entity = expenseRepo.findById(expenseId).orElseThrow(() -> new RuntimeException("Expense not found"));
+       if(!entity.getProfile().getId().equals(profile.getId())){
+           throw new RuntimeException("Unathorise to delete this expesne");
+       }
+        expenseRepo.delete(entity);
+    }
+
 
 
     // helper methods

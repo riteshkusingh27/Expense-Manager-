@@ -32,8 +32,6 @@ public class IncomeService {
         IncomeEntity newincome = toEntity(dto,profile,category);
         newincome = incomerepo.save(newincome);
         return toDto(newincome);
-
-
     }
  // retrieve all the expenses for the current profile for current month on the start date and end date
     public List<IncomeDto> getCurrentMonthIncome(){
@@ -43,6 +41,17 @@ public class IncomeService {
         LocalDate enddate =  now.withDayOfMonth(now.lengthOfMonth());
         List<IncomeEntity>  list = incomerepo.findByProfileIdAndDateBetween(profile.getId(),startdate,enddate);
         return list.stream().map(this::toDto).toList();
+    }
+
+    ///  deleted income by id for the current user
+
+    public void deleteIncome(Long expenseId){
+        ProfileEntity profile =  profileService.getcurrentProfile();
+        IncomeEntity entity = incomerepo.findById(expenseId).orElseThrow(() -> new RuntimeException("Expense not found"));
+        if(!entity.getProfile().getId().equals(profile.getId())){
+            throw new RuntimeException("Unauthorised to delete this expense");
+        }
+        incomerepo.delete(entity);
     }
 
 

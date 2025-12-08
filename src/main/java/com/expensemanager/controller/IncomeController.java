@@ -28,5 +28,13 @@ public class IncomeController {
         List<IncomeDto> expenses = incomeService.getCurrentMonthIncome();
         return ResponseEntity.ok(expenses);
     }
+
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteIncome(@PathVariable Long id){
+        incomeService.deleteIncome(id);
+        return ResponseEntity.noContent().build();
+
+    }
 }
 
