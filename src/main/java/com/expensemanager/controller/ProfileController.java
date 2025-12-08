@@ -3,10 +3,12 @@ package com.expensemanager.controller;
 import com.expensemanager.dto.AuthDto;
 import com.expensemanager.dto.Profiledto;
 import com.expensemanager.service.ProfileService;
+import com.expensemanager.util.Jwtutil;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
@@ -16,6 +18,9 @@ import java.util.Map;
 public class ProfileController {
 
     private final ProfileService profileService;
+    private final Jwtutil jwtutil;
+
+    private final UserDetailsService userdetailsservice;
 
     @PostMapping("/register")
     public ResponseEntity<Profiledto> profile(@RequestBody Profiledto profile){
@@ -46,6 +51,44 @@ public class ProfileController {
           } catch(Exception e){
               return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error","Invalid email or password"));
           }
+    }
+
+
+    @PostMapping("/refresh")
+    public ResponseEntity<?> refreshToken(@RequestBody Map<String,Object> map){
+        String refreshToken = map.get("refreshtoken").toString();
+
+        if (refreshToken == null || refreshToken.isBlank()) {
+            return ResponseEntity.badRequest().body(Map.of("error", "Refresh token is missing"));
+        }
+
+        String email;
+        try{
+            email = jwtutil.extractUsername(refreshToken);
+
+        } catch (Exception e){
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("error" , "Invalid referesh token"));
+
+        }
+        if(!jwtutil.isRefreshTokenValid(refreshToken)){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", "Invalid refresh token"));
+        }
+
+        UserDetails user = userdetailsservice.loadUserByUsername(email);
+
+
+        // generate new access token
+        String newAccessToken = jwtutil.generateAccessToken(email);
+
+        return ResponseEntity.ok(Map.of(
+                "accesstoken" , newAccessToken,
+                "refreshtoken" , refreshToken
+        ));
+
+
+
+
+
     }
 
    @GetMapping("/test")

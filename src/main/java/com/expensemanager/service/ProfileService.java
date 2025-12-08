@@ -113,13 +113,18 @@ public class ProfileService {
         try{
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(authdto.getEmail(), authdto.getPassword()));
             // generate jwt token
-            String token = jwtutil.generateToken(authdto.getEmail());
+//            String token = jwtutil.generateToken(authdto.getEmail());
+            String accesstoken = jwtutil.generateAccessToken(authdto.getEmail());
+            String refreshtoken = jwtutil.generateRefreshToken(authdto.getEmail());
             return Map.of(
-                    "token" , token,
+                    "accesstoken" , accesstoken,
+                    "refreshtoken" , refreshtoken,
                     "user" , getpublicProfile(authdto.getEmail())
             );
         } catch (Exception e){
             throw new RuntimeException("Invalid email or password");
         }
     }
+
+
 }

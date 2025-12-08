@@ -18,28 +18,38 @@ import java.util.function.Function;
 public class Jwtutil {
     @Value("${jwt.secret.key}")
     private  String SECRET_KEY;
+   @Value("${jwt.access.expiration}")
+    private long ACCESS_TOKEN_VALIDITY;
+    @Value("${jwt.refresh.expiration}")
+    private long REFRESH_TOKEN_VALIDITY;
 
-    public String generateToken(String userdetails) {
+    public String generateAccessToken(String userdetails) {
         // claims == piece of token embedded in a jwt token
         Map<String, Object> claims = new HashMap<>();
-        return createToken(claims, userdetails);
+        return createToken(claims, userdetails , ACCESS_TOKEN_VALIDITY);
+    }
+    // refersh token
+    public String generateRefreshToken(String userdetails){
+        Map<String, Object> claims = new HashMap<>();
+        return createToken(claims, userdetails , REFRESH_TOKEN_VALIDITY);
     }
 
-    private String createToken(Map<String, Object> claims, String username) {
+    private String createToken(Map<String, Object> claims, String username , long validity) {
         return Jwts.builder()
-                .setClaims(claims)
+                .setClaims(claims)  // payload data
                 .setSubject(username)
                 .setIssuedAt(new java.util.Date(System.currentTimeMillis()))
                 // setting expiration time for 10 hours
-                .setExpiration(new java.util.Date(System.currentTimeMillis() + 1000 * 60 * 60 * 10)) // 10 hours
+                .setExpiration(new java.util.Date(System.currentTimeMillis() + validity)) // 10 hours
                 .signWith(getSecretKey())
                 // generates the final jwt string
                 .compact();
     }
 
+                         // extractio of payload jwt
 
     public String extractUsername(String token) {
-        return extractClaim(token, Claims::getSubject);
+        return extractClaim(token, Claims::getSubject);     // Claims is an interface so the subject is being retirived via getsubject emthod
     }
 
     public Date extractExpiration(String token) {
@@ -72,6 +82,10 @@ public class Jwtutil {
         final String username = extractUsername(token);
         return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
 
+    }
+
+    public Boolean isRefreshTokenValid(String token){
+        return !isTokenExpired(token);
     }
 
 }
